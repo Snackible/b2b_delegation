@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Task Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg:#F7F8FA; --surface:#FFFFFF; --border:#E8EAED; --text:#1A1D23; --text-2:#6B7280; --accent:#2563EB; --radius:12px; --radius-sm:7px; --shadow:0 1px 3px rgba(0,0,0,.07),0 4px 16px rgba(0,0,0,.05); --shadow-lg:0 8px 32px rgba(0,0,0,.10); }
+    body { font-family:'Inter',-apple-system,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; -webkit-font-smoothing:antialiased; }
+    .app-header { background:var(--surface); border-bottom:1px solid var(--border); padding:18px 32px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; }
+    .header-left { display:flex; align-items:center; gap:14px; }
+    .logo-mark { width:40px; height:40px; background:var(--accent); color:#fff; border-radius:10px; display:grid; place-items:center; font-family:'DM Mono',monospace; font-size:13px; font-weight:500; }
+    .app-title { font-size:18px; font-weight:700; letter-spacing:-.02em; }
+    .app-subtitle { font-size:12px; color:var(--text-2); letter-spacing:.04em; text-transform:uppercase; margin-top:2px; }
+    .header-right { display:flex; align-items:center; gap:12px; }
+    .sync-time { font-size:12px; color:var(--text-2); font-family:'DM Mono',monospace; }
+    .refresh-btn { padding:7px 14px; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--surface); color:var(--text); font-size:13px; cursor:pointer; font-family:'Inter',sans-serif; }
+    .refresh-btn:hover { background:var(--bg); border-color:var(--accent); color:var(--accent); }
+    .tab-nav { display:flex; gap:2px; padding:16px 32px 0; border-bottom:1px solid var(--border); background:var(--surface); }
+    .tab-btn { padding:10px 22px; border:none; background:none; font-size:14px; font-family:'Inter',sans-serif; font-weight:500; color:var(--text-2); cursor:pointer; border-bottom:2px solid transparent; transition:color .15s,border-color .15s; border-radius:var(--radius-sm) var(--radius-sm) 0 0; margin-bottom:-1px; }
+    .tab-btn:hover { color:var(--text); background:var(--bg); }
+    .tab-btn.active { color:var(--accent); border-bottom-color:var(--accent); }
+    .tab-btn.supervisor { color:#7C3AED; }
+    .tab-btn.supervisor.active { color:#7C3AED; border-bottom-color:#7C3AED; }
+    .main-content { padding:28px 32px; max-width:1200px; margin:0 auto; }
+    .progress-wrap { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:18px 22px; margin-bottom:24px; box-shadow:var(--shadow); }
+    .progress-stats { display:flex; align-items:baseline; gap:12px; margin-bottom:10px; }
+    .progress-pct { font-size:28px; font-weight:700; color:var(--accent); font-family:'DM Mono',monospace; }
+    .progress-detail { font-size:13px; color:var(--text-2); }
+    .progress-bar-bg { position:relative; height:8px; background:var(--border); border-radius:99px; overflow:hidden; }
+    .progress-bar-fill { position:absolute; top:0; left:0; height:100%; border-radius:99px; transition:width .4s ease; }
+    .done-fill { background:#22C55E; }
+    .progress-fill { background:#60A5FA; }
+    .task-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:16px; }
+    .task-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:20px; box-shadow:var(--shadow); transition:box-shadow .2s,transform .2s; display:flex; flex-direction:column; gap:10px; }
+    .task-card:hover { box-shadow:var(--shadow-lg); transform:translateY(-1px); }
+    .task-card.done { opacity:.65; }
+    .task-card.overdue { border-left:3px solid #E53935; }
+    .task-header { display:flex; justify-content:space-between; align-items:flex-start; gap:8px; flex-wrap:wrap; }
+    .task-meta { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+    .badge { font-size:11px; font-weight:600; padding:3px 9px; border-radius:99px; border:1px solid; letter-spacing:.02em; white-space:nowrap; }
+    .deadline { font-size:11px; color:var(--text-2); font-family:'DM Mono',monospace; }
+    .deadline.overdue-text { color:#E53935; font-weight:600; }
+    .deadline.soon-text { color:#F57C00; font-weight:600; }
+    .task-title { font-size:15px; font-weight:600; line-height:1.35; color:var(--text); }
+    .task-desc { font-size:13px; color:var(--text-2); line-height:1.5; }
+    .task-owner { font-size:12px; color:var(--text-2); }
+    .status-btn { font-size:12px; font-weight:600; padding:5px 12px; border:1px solid; border-radius:var(--radius-sm); cursor:pointer; white-space:nowrap; font-family:'Inter',sans-serif; display:flex; align-items:center; gap:4px; }
+    .status-btn:not(.readonly):hover { filter:brightness(.93); }
+    .status-btn.readonly { cursor:default; }
+    .next-hint { font-size:10px; opacity:.6; font-weight:400; }
+    .supervisor-view { display:flex; flex-direction:column; gap:36px; }
+    .supervisor-section { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:24px; box-shadow:var(--shadow); }
+    .supervisor-section-header { margin-bottom:20px; }
+    .supervisor-section-header h2 { font-size:16px; font-weight:700; margin-bottom:12px; color:#7C3AED; }
+    .loading { display:flex; align-items:center; gap:12px; color:var(--text-2); padding:40px 0; }
+    .spinner { width:20px; height:20px; border:2px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin .7s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .error-msg { background:#FEF2F2; border:1px solid #FECACA; color:#DC2626; border-radius:var(--radius); padding:16px 20px; font-size:14px; }
+    .empty { color:var(--text-2); font-size:14px; padding:32px; text-align:center; border:1px dashed var(--border); border-radius:var(--radius); }
+    .setup-banner { position:fixed; bottom:0; left:0; right:0; background:#FEF9C3; border-top:1px solid #FDE68A; color:#92400E; padding:12px 32px; font-size:13px; text-align:center; }
+    .setup-banner code { font-family:'DM Mono',monospace; background:#FDE68A44; padding:1px 6px; border-radius:4px; }
+    @media(max-width:768px) { .app-header{padding:14px 16px;} .tab-nav{padding:12px 16px 0;overflow-x:auto;} .main-content{padding:20px 16px;} .task-grid{grid-template-columns:1fr;} .app-subtitle{display:none;} }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useCallback } = React;
+
+const SHEET_URL  = "YOUR_GOOGLE_SHEET_CSV_URL_HERE";
+const EXEC_NAMES = ["Executive 1", "Executive 2"];
+
+const PRIORITY_CONFIG = { Urgent:{color:"#E53935",bg:"#FFEBEE"}, Important:{color:"#F57C00",bg:"#FFF3E0"}, Normal:{color:"#388E3C",bg:"#E8F5E9"} };
+const STATUS_CYCLE = ["Not Started","In Progress","Done"];
+const STATUS_CONFIG = { "Not Started":{color:"#9E9E9E",bg:"#F5F5F5"}, "In Progress":{color:"#1565C0",bg:"#E3F2FD"}, "Done":{color:"#2E7D32",bg:"#E8F5E9"} };
+
+function parseCSV(text) {
+  const lines = text.trim().split("\n");
+  const headers = lines[0].split(",").map(h => h.trim().replace(/^"|"$/g,""));
+  return lines.slice(1).map(line => {
+    const vals = line.split(",").map(v => v.trim().replace(/^"|"$/g,""));
+    return headers.reduce((obj,h,i) => ({...obj,[h]:vals[i]||""}),{});
+  });
+}
+function loadOverrides() { try { return JSON.parse(localStorage.getItem("taskOverrides")||"{}"); } catch { return {}; } }
+function saveOverrides(d) { localStorage.setItem("taskOverrides",JSON.stringify(d)); }
+
+function PriorityBadge({priority}) {
+  const cfg = PRIORITY_CONFIG[priority]||PRIORITY_CONFIG["Normal"];
+  const icons = {Urgent:"🔴",Important:"🟠",Normal:"🟢"};
+  return <span className="badge" style={{color:cfg.color,background:cfg.bg,borderColor:cfg.color+"33"}}>{icons[priority]||"🟢"} {priority}</span>;
+}
+
+function StatusButton({status,onClick,readonly}) {
+  const cfg = STATUS_CONFIG[status]||STATUS_CONFIG["Not Started"];
+  const icons = {"Done":"✓","In Progress":"⟳","Not Started":"○"};
+  const next = STATUS_CYCLE[(STATUS_CYCLE.indexOf(status)+1)%3];
+  return (
+    <button className={`status-btn ${readonly?"readonly":""}`} style={{color:cfg.color,background:cfg.bg,borderColor:cfg.color+"55"}} onClick={readonly?undefined:onClick}>
+      {icons[status]||"○"} {status}
+      {!readonly && <span className="next-hint">→ {next}</span>}
+    </button>
+  );
+}
+
+function TaskCard({task,onStatusChange,readonly}) {
+  const daysLeft = task.Deadline ? Math.ceil((new Date(task.Deadline)-new Date())/86400000) : null;
+  const isOverdue = daysLeft!==null && daysLeft<0 && task.Status!=="Done";
+  const isDueSoon = daysLeft!==null && daysLeft<=3 && daysLeft>=0 && task.Status!=="Done";
+  return (
+    <div className={`task-card ${task.Status==="Done"?"done":""} ${isOverdue?"overdue":""}`}>
+      <div className="task-header">
+        <div className="task-meta">
+          <PriorityBadge priority={task.Priority}/>
+          {task.Deadline && <span className={`deadline ${isOverdue?"overdue-text":isDueSoon?"soon-text":""}`}>{isOverdue?`⚠ ${Math.abs(daysLeft)}d overdue`:isDueSoon?`⏰ ${daysLeft}d left`:`📅 ${task.Deadline}`}</span>}
+        </div>
+        <StatusButton status={task.Status} onClick={onStatusChange} readonly={readonly}/>
+      </div>
+      <h3 className="task-title">{task.Task}</h3>
+      {task.Description && <p className="task-desc">{task.Description}</p>}
+      {task.Owner && <div className="task-owner">👤 {task.Owner}</div>}
+    </div>
+  );
+}
+
+function ProgressBar({tasks}) {
+  const done = tasks.filter(t=>t.Status==="Done").length;
+  const inP  = tasks.filter(t=>t.Status==="In Progress").length;
+  const pct  = tasks.length ? Math.round(done/tasks.length*100) : 0;
+  const iPct = tasks.length ? Math.round(inP/tasks.length*100) : 0;
+  return (
+    <div className="progress-wrap">
+      <div className="progress-stats"><span className="progress-pct">{pct}%</span><span className="progress-detail">{done} done · {inP} in progress · {tasks.length-done-inP} not started</span></div>
+      <div className="progress-bar-bg">
+        <div className="progress-bar-fill done-fill" style={{width:`${pct}%`}}/>
+        <div className="progress-bar-fill progress-fill" style={{width:`${iPct}%`,left:`${pct}%`}}/>
+      </div>
+    </div>
+  );
+}
+
+const pOrder = {Urgent:0,Important:1,Normal:2};
+
+function ExecTab({tasks,execName,overrides,onStatusChange}) {
+  const myTasks = tasks.filter(t=>t.Assignee===execName).map(t=>({...t,Status:overrides[t._id]||t.Status||"Not Started"})).sort((a,b)=>(pOrder[a.Priority]??2)-(pOrder[b.Priority]??2));
+  if (!myTasks.length) return <div className="empty">No tasks assigned yet.</div>;
+  return <div><ProgressBar tasks={myTasks}/><div className="task-grid">{myTasks.map(task=><TaskCard key={task._id} task={task} readonly={false} onStatusChange={()=>onStatusChange(task._id,task.Status)}/>)}</div></div>;
+}
+
+function SupervisorTab({tasks,overrides}) {
+  const all = tasks.map(t=>({...t,Status:overrides[t._id]||t.Status||"Not Started"}));
+  return (
+    <div className="supervisor-view">
+      {EXEC_NAMES.map(name=>{
+        const myTasks = all.filter(t=>t.Assignee===name).sort((a,b)=>(pOrder[a.Priority]??2)-(pOrder[b.Priority]??2));
+        return (
+          <div key={name} className="supervisor-section">
+            <div className="supervisor-section-header"><h2>{name}</h2><ProgressBar tasks={myTasks}/></div>
+            {myTasks.length===0?<div className="empty">No tasks yet.</div>:<div className="task-grid">{myTasks.map(task=><TaskCard key={task._id} task={task} readonly={true}/>)}</div>}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+const DEMO = [
+  {_id:"1",Task:"Q3 Report Draft",Description:"Complete the quarterly summary deck",Assignee:EXEC_NAMES[0],Priority:"Urgent",Deadline:"2026-07-20",Owner:EXEC_NAMES[0],Status:"In Progress"},
+  {_id:"2",Task:"Client Onboarding Emails",Description:"Send welcome sequence to new clients",Assignee:EXEC_NAMES[0],Priority:"Important",Deadline:"2026-07-22",Owner:EXEC_NAMES[0],Status:"Not Started"},
+  {_id:"3",Task:"Budget Review",Description:"Analyse spend vs forecast for July",Assignee:EXEC_NAMES[0],Priority:"Normal",Deadline:"2026-07-30",Owner:EXEC_NAMES[0],Status:"Not Started"},
+  {_id:"4",Task:"Vendor Contracts",Description:"Review and sign pending vendor agreements",Assignee:EXEC_NAMES[1],Priority:"Urgent",Deadline:"2026-07-18",Owner:EXEC_NAMES[1],Status:"Not Started"},
+  {_id:"5",Task:"Team Performance Reviews",Description:"Complete mid-year reviews for all direct reports",Assignee:EXEC_NAMES[1],Priority:"Important",Deadline:"2026-07-25",Owner:EXEC_NAMES[1],Status:"In Progress"},
+  {_id:"6",Task:"Product Roadmap Update",Description:"Update H2 roadmap with revised timelines",Assignee:EXEC_NAMES[1],Priority:"Normal",Deadline:"2026-08-01",Owner:EXEC_NAMES[1],Status:"Done"},
+];
+
+function App() {
+  const [tasks,setTasks] = useState([]);
+  const [overrides,setOverrides] = useState(loadOverrides);
+  const [activeTab,setActiveTab] = useState(0);
+  const [loading,setLoading] = useState(true);
+  const [error,setError] = useState(null);
+  const [lastSync,setLastSync] = useState(null);
+  const isDemo = SHEET_URL==="YOUR_GOOGLE_SHEET_CSV_URL_HERE";
+
+  const fetchTasks = useCallback(async()=>{
+    if(isDemo){setTasks(DEMO);setLoading(false);setLastSync(new Date());return;}
+    try {
+      const res = await fetch(SHEET_URL);
+      if(!res.ok) throw new Error();
+      const rows = parseCSV(await res.text()).map((r,i)=>({...r,_id:String(i)}));
+      setTasks(rows);setLastSync(new Date());setError(null);
+    } catch { setError("Could not load tasks. Check SHEET_URL at the top of the file."); }
+    finally { setLoading(false); }
+  },[]);
+
+  useEffect(()=>{ fetchTasks(); const t=setInterval(fetchTasks,60000); return()=>clearInterval(t); },[fetchTasks]);
+
+  const handleStatus = (id,current)=>{
+    const next = STATUS_CYCLE[(STATUS_CYCLE.indexOf(current)+1)%3];
+    const u = {...overrides,[id]:next};
+    setOverrides(u); saveOverrides(u);
+  };
+
+  return (
+    <div className="app">
+      <header className="app-header">
+        <div className="header-left">
+          <div className="logo-mark">TD</div>
+          <div><h1 className="app-title">Task Dashboard</h1><p className="app-subtitle">Delegation · Progress · Accountability</p></div>
+        </div>
+        <div className="header-right">
+          {lastSync && <span className="sync-time">Synced {lastSync.toLocaleTimeString()}</span>}
+          <button className="refresh-btn" onClick={fetchTasks}>↻ Refresh</button>
+        </div>
+      </header>
+      <nav className="tab-nav">
+        {[...EXEC_NAMES,"Supervisor View"].map((tab,i)=>(
+          <button key={tab} className={`tab-btn ${activeTab===i?"active":""} ${i===2?"supervisor":""}`} onClick={()=>setActiveTab(i)}>
+            {i===2?"👁 ":""}{tab}
+          </button>
+        ))}
+      </nav>
+      <main className="main-content">
+        {loading && <div className="loading"><div className="spinner"/>Loading tasks…</div>}
+        {error && <div className="error-msg">⚠ {error}</div>}
+        {!loading && !error && <>
+          {activeTab===0 && <ExecTab tasks={tasks} execName={EXEC_NAMES[0]} overrides={overrides} onStatusChange={handleStatus}/>}
+          {activeTab===1 && <ExecTab tasks={tasks} execName={EXEC_NAMES[1]} overrides={overrides} onStatusChange={handleStatus}/>}
+          {activeTab===2 && <SupervisorTab tasks={tasks} overrides={overrides}/>}
+        </>}
+      </main>
+      {isDemo && <div className="setup-banner">📋 <strong>Demo mode.</strong> Replace <code>SHEET_URL</code> near the top of this file with your Google Sheet CSV link.</div>}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>
