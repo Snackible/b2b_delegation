@@ -521,7 +521,7 @@ function ExecTab({tasks, execName, overrides, onStatusChange, colorClass, salesD
   }), [salesData, execName]);
 
   const filteredSales = useMemo(()=>filterSalesByDate(mySalesRows, dateFilter, customFrom, customTo), [mySalesRows, dateFilter, customFrom, customTo]);
-  const salesTotal = useMemo(()=>filteredSales.reduce((s,r)=>s+parseSalesAmt(r["Gross Sales"]),0), [filteredSales]);
+  const salesTotal = useMemo(()=>filteredSales.reduce((s,r)=>s+parseSalesAmt(r["Gross Sales "]||r["Gross Sales"]),0), [filteredSales]);
   const salesCount = filteredSales.length;
 
   return(
