@@ -581,7 +581,7 @@ function App(){
   const fetchSales = useCallback(async () => {
     setSalesLoading(true);
     try{
-      const res = await fetch(`${PROXY}?sheetId=${SALES_SHEET_ID}&gid=${SALES_GID}`);
+      const res = await fetch(`${PROXY}?sheetId=${SALES_SHEET_ID}&gid=${SALES_GID}`, {redirect:"follow"});
       if(!res.ok) throw new Error(`HTTP ${res.status}`);
       const text = await res.text();
       if(text.startsWith("error:")) throw new Error(text.replace("error:","").trim());
