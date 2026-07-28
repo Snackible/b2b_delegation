@@ -186,8 +186,7 @@ const { useState, useEffect, useCallback, useMemo } = React;
 
 // ── CONFIG ──────────────────────────────────────────────────────────────────
 const PROXY = "https://script.google.com/a/macros/snackible.com/s/AKfycbxxuPIWVlrpAbHF9dz5UyJAjpJmTJDyyQxSjyPhDMAhl7guQip5-4WGxbxuvMay3reD/exec";
-const SALES_SHEET_ID = "1JROgqAImIyDHQOigpm9lc8lsW7t8T067YrakU8HExNg";
-const SALES_GID = "930467071";
+const SALES_SHEET_NAME = "Sales";
 const EXEC_NAMES = ["Prabnoor","Kritik"];
 const STATUS_CYCLE = ["Not Started","In Progress","Blocked","Done"];
 const pOrder = {Urgent:0,Important:1,Normal:2};
@@ -581,7 +580,7 @@ function App(){
   const fetchSales = useCallback(async () => {
     setSalesLoading(true);
     try{
-      const res = await fetch(`${PROXY}?sheetId=${SALES_SHEET_ID}&gid=${SALES_GID}`, {redirect:"follow"});
+      const res = await fetch(`${PROXY}?name=${SALES_SHEET_NAME}`);
       if(!res.ok) throw new Error(`HTTP ${res.status}`);
       const text = await res.text();
       if(text.startsWith("error:")) throw new Error(text.replace("error:","").trim());
