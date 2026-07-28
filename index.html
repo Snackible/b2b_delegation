@@ -515,7 +515,8 @@ function ExecTab({tasks, execName, overrides, onStatusChange, colorClass, salesD
     .map(t=>({...t, Status:overrides[t._id]||t["Status"]||"Not Started"}));
 
   const mySalesRows = useMemo(()=>salesData.filter(r=>{
-    const poc = (r["POC"]||"").trim().toLowerCase();
+    const poc = (r["POC"]||"").trim().toLowerCase()
+      .replace("prabhnoor","prabnoor");
     return poc === execName.toLowerCase();
   }), [salesData, execName]);
 
