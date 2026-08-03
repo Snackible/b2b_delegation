@@ -1,190 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Snackible B2B Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <style>
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{
-      --bg:#0D0D0D;--surface:#1A1A1A;--surface-2:#222222;--border:#2A2A2A;
-      --text:#F0F0F0;--text-2:#A0A0A0;--text-3:#555555;
-      --blue:#3B82F6;--blue-lt:#1E3A5F;--blue-dk:#93C5FD;
-      --purple:#8B5CF6;--purple-lt:#2D1B5E;--purple-dk:#C4B5FD;
-      --green:#22C55E;--green-lt:#14532D;--green-dk:#86EFAC;
-      --amber:#F59E0B;--amber-lt:#451A03;--amber-dk:#FCD34D;
-      --red:#EF4444;--red-lt:#450A0A;--red-dk:#FCA5A5;
-      --sky:#06B6D4;--sky-lt:#0C3B4A;--sky-dk:#67E8F9;
-      --radius:12px;--radius-sm:8px;--radius-xs:5px;
-      --shadow:0 1px 3px rgba(0,0,0,.4),0 4px 20px rgba(0,0,0,.3);
-      --shadow-lg:0 8px 40px rgba(0,0,0,.6);
-    }
-    html{scrollbar-color:#333 #0D0D0D;scrollbar-width:thin}
-    body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
-
-    /* HEADER */
-    .app-header{background:#111;border-bottom:2px solid #22C55E;padding:16px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
-    .logo-mark{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;color:#22C55E;letter-spacing:.12em;text-transform:uppercase}
-    .logo-slash{color:#555;margin:0 4px}
-    .logo-b2b{color:#F0F0F0;font-weight:700}
-    .app-subtitle{font-size:10px;color:var(--text-2);letter-spacing:.06em;text-transform:uppercase;margin-top:2px}
-    .header-right{display:flex;align-items:center;gap:10px}
-    .sync-time{font-size:11px;color:var(--text-2);font-family:'DM Mono',monospace}
-    .live-dot{width:7px;height:7px;background:#22C55E;border-radius:50%;display:inline-block;margin-right:5px;box-shadow:0 0 6px #22C55E}
-    .refresh-btn{padding:6px 14px;border:1px solid #333;border-radius:var(--radius-sm);background:#1A1A1A;color:var(--text-2);font-size:11px;cursor:pointer;font-family:'Inter',sans-serif;font-weight:500;transition:all .15s}
-    .refresh-btn:hover{border-color:#22C55E;color:#22C55E}
-
-    /* TABS */
-    .tab-nav{display:flex;padding:0 32px;background:#111;border-bottom:1px solid var(--border)}
-    .tab-btn{padding:13px 26px;border:none;background:none;font-size:12px;font-family:'Inter',sans-serif;font-weight:700;color:var(--text-2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;letter-spacing:.04em;text-transform:uppercase}
-    .tab-btn.active-prabnoor{color:#22C55E;border-bottom-color:#22C55E}
-    .tab-btn.active-kritik{color:var(--amber);border-bottom-color:var(--amber)}
-
-    /* MAIN */
-    .main-content{padding:20px 32px}
-
-    /* DATE FILTER BAR */
-    .date-filter-wrap{display:flex;align-items:center;gap:8px;margin-bottom:18px;flex-wrap:wrap}
-    .date-filter-label{font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em;margin-right:4px}
-    .date-filter-btn{padding:5px 14px;border:1px solid var(--border);border-radius:99px;background:var(--surface);color:var(--text-2);font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s;letter-spacing:.01em}
-    .date-filter-btn:hover{border-color:#555;color:var(--text)}
-    .date-filter-btn.active-green{background:var(--green-lt);border-color:var(--green);color:var(--green-dk)}
-    .date-filter-btn.active-amber{background:var(--amber-lt);border-color:var(--amber);color:var(--amber-dk)}
-    .custom-dates{display:flex;align-items:center;gap:6px;margin-left:4px}
-    .date-input{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-size:11px;font-family:'DM Mono',monospace;padding:4px 8px;cursor:pointer;outline:none}
-    .date-input:focus{border-color:#555}
-    .date-sep{color:var(--text-3);font-size:12px}
-    .sales-count{font-size:10px;color:var(--text-3);margin-left:4px;font-family:'DM Mono',monospace}
-
-    /* KPI BAR */
-    .kpi-bar{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap}
-    .kpi-card{flex:1;min-width:130px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;position:relative;overflow:hidden}
-    .kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
-    .kpi-card.kpi-sales::before{background:var(--green)}
-    .kpi-card.kpi-mails::before{background:var(--amber)}
-    .kpi-card.kpi-calls::before{background:var(--blue)}
-    .kpi-card.kpi-linkedin::before{background:var(--purple)}
-    .kpi-card.kpi-samples::before{background:var(--sky)}
-    .kpi-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-2);margin-bottom:6px}
-    .kpi-value{font-size:24px;font-weight:700;font-family:'DM Mono',monospace;line-height:1}
-    .kpi-value.green{color:var(--green)}
-    .kpi-value.amber{color:var(--amber)}
-    .kpi-value.blue{color:var(--blue-dk)}
-    .kpi-value.purple{color:var(--purple-dk)}
-    .kpi-value.sky{color:var(--sky-dk)}
-    .kpi-sub{font-size:9px;color:var(--text-3);margin-top:4px;font-family:'DM Mono',monospace}
-
-    /* PROGRESS CARD */
-    .progress-card{border-radius:var(--radius);padding:16px 20px;margin-bottom:18px;display:flex;align-items:center;gap:20px;background:var(--surface-2);border:1px solid var(--border)}
-    .progress-pct{font-size:36px;font-weight:700;font-family:'DM Mono',monospace;letter-spacing:-.04em;line-height:1}
-    .progress-pct.green{color:var(--green)}
-    .progress-pct.amber{color:var(--amber)}
-    .progress-right{flex:1}
-    .progress-label{font-size:10px;font-weight:700;color:var(--text-2);margin-bottom:7px;text-transform:uppercase;letter-spacing:.06em}
-    .progress-bar-bg{height:5px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;position:relative}
-    .progress-bar-fill{position:absolute;top:0;left:0;height:100%;border-radius:99px;transition:width .5s ease}
-    .done-fill.green{background:var(--green)}
-    .done-fill.amber{background:var(--amber)}
-    .ip-fill{background:var(--blue);left:var(--done-pct)}
-    .progress-chips{display:flex;gap:6px;margin-top:7px;flex-wrap:wrap}
-    .chip{font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px}
-    .chip-done{background:var(--green-lt);color:var(--green-dk)}
-    .chip-ip{background:var(--blue-lt);color:var(--blue-dk)}
-    .chip-ns{background:#1E1E1E;color:var(--text-2);border:1px solid var(--border)}
-
-    /* COLUMNS */
-    .columns-row{display:flex;gap:12px;overflow-x:auto;padding-bottom:12px;align-items:flex-start}
-    .column-container{flex:0 0 270px;min-width:230px;border-radius:var(--radius);background:var(--surface);border:1px solid var(--border);padding:12px;min-height:180px}
-    .column-departments{flex:0 0 480px;min-width:420px}
-    @keyframes diwali-pulse{0%,100%{box-shadow:0 0 0 1px #F59E0B55,var(--shadow)}50%{box-shadow:0 0 0 3px #F59E0B99,0 8px 32px #F59E0B22}}
-    .column-diwali{animation:diwali-pulse 1.5s ease-in-out infinite;border-color:#F59E0B66}
-    .column-header{border-radius:var(--radius-sm);padding:9px 11px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
-    .column-header-left{display:flex;align-items:center;gap:6px}
-    .column-header-icon{font-size:15px;line-height:1}
-    .column-header-label{font-size:12px;font-weight:700}
-    .column-header-right{display:flex;align-items:center;gap:5px;flex-shrink:0}
-    .priority-badge-header{font-size:9px;font-weight:700;padding:2px 6px;border-radius:99px;background:rgba(255,255,255,.2);color:#fff;letter-spacing:.04em;border:1px solid rgba(255,255,255,.3)}
-    .col-header-depts{background:#1E2030;border:1px solid #2A3050}
-    .col-header-depts .column-header-label{color:#A0B0FF}
-    .col-header-diwali{background:linear-gradient(135deg,#7C2D00,#7C0000)}
-    .col-header-diwali .column-header-label{color:#FCD34D}
-    .col-header-pipeline{background:var(--sky-lt)}
-    .col-header-pipeline .column-header-label{color:var(--sky-dk)}
-    .col-header-clients{background:#0C2A20}
-    .col-header-clients .column-header-label{color:var(--green-dk)}
-    .col-count{font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;background:rgba(255,255,255,.1);color:var(--text-2)}
-    .col-header-diwali .col-count{background:rgba(255,255,255,.2);color:#fff}
-    .column-empty{color:var(--text-3);font-size:11px;padding:24px 12px;text-align:center;border:1px dashed var(--border);border-radius:var(--radius-sm)}
-    .column-tasks{display:flex;flex-direction:column;gap:9px}
-    .dept-section{margin-bottom:14px}
-    .dept-section:last-child{margin-bottom:0}
-    .dept-section-label{font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--text-3);text-transform:uppercase;margin-bottom:7px;padding-left:2px;border-bottom:1px solid var(--border);padding-bottom:4px}
-    .pipeline-stage-label{font-size:9px;font-weight:700;letter-spacing:.08em;color:var(--text-3);text-transform:uppercase;margin-bottom:6px;margin-top:10px;padding-left:2px}
-    .pipeline-stage-label:first-child{margin-top:0}
-
-    /* TASK CARD */
-    .task-card{background:var(--surface);border-radius:var(--radius-sm);padding:12px;box-shadow:var(--shadow);border:1px solid var(--border);position:relative;overflow:hidden;transition:box-shadow .2s,transform .2s}
-    .task-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
-    .task-card.urgent::before{background:linear-gradient(90deg,#EF4444,#F97316)}
-    .task-card.important::before{background:linear-gradient(90deg,#F59E0B,#FBBF24)}
-    .task-card.normal::before{background:linear-gradient(90deg,#22C55E,#34D399)}
-    .task-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-1px);border-color:#3A3A3A}
-    .task-card.done{opacity:.5}
-    .task-card.overdue{border-color:#7F1D1D}
-    .card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:6px;margin-bottom:7px;flex-wrap:wrap}
-    .card-badges{display:flex;gap:4px;flex-wrap:wrap;align-items:center}
-    .priority-badge{font-size:9px;font-weight:700;padding:2px 6px;border-radius:99px;letter-spacing:.04em;text-transform:uppercase}
-    .priority-badge.urgent{background:var(--red-lt);color:var(--red-dk)}
-    .priority-badge.important{background:var(--amber-lt);color:var(--amber-dk)}
-    .priority-badge.normal{background:var(--green-lt);color:var(--green-dk)}
-    .deadline-badge{font-size:9px;font-weight:500;padding:2px 6px;border-radius:99px;background:#1E1E1E;color:var(--text-2);font-family:'DM Mono',monospace;border:1px solid var(--border)}
-    .deadline-badge.overdue{background:var(--red-lt);color:var(--red-dk);font-weight:700;border-color:#7F1D1D}
-    .deadline-badge.soon{background:var(--amber-lt);color:var(--amber-dk);font-weight:700;border-color:#78350F}
-    .task-title{font-size:12px;font-weight:600;color:var(--text);line-height:1.45;margin-bottom:7px}
-    .task-title.done-title{text-decoration:line-through;color:var(--text-3)}
-    .remarks-box{background:#1C1800;border-radius:var(--radius-xs);padding:6px 8px;margin-bottom:7px;border-left:2px solid var(--amber)}
-    .remarks-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--amber-dk);margin-bottom:2px}
-    .remarks-text{font-size:11px;color:#C8A84B;line-height:1.45;font-style:italic}
-    .completion-info{font-size:10px;color:var(--green-dk);background:var(--green-lt);padding:3px 7px;border-radius:var(--radius-xs);font-family:'DM Mono',monospace;margin-bottom:6px}
-    .status-btn{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:4px 8px;border:1px solid;border-radius:var(--radius-xs);cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s;white-space:nowrap}
-    .status-btn.not-started{background:#1A1A1A;color:var(--text-2);border-color:#333}
-    .status-btn.in-progress{background:var(--blue-lt);color:var(--blue-dk);border-color:#2A4A7F}
-    .status-btn.blocked{background:var(--amber-lt);color:var(--amber-dk);border-color:#78350F}
-    .status-btn.done{background:var(--green-lt);color:var(--green-dk);border-color:#166534}
-    .status-btn:not(.readonly):hover{filter:brightness(1.2);transform:scale(.97)}
-    .status-btn.readonly{cursor:default}
-    .next-hint{font-size:8px;opacity:.5;font-weight:400}
-
-    /* STATES */
-    .loading{display:flex;align-items:center;gap:10px;color:var(--text-2);padding:60px 0;justify-content:center}
-    .spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    .error-msg{background:var(--red-lt);border:1px solid #7F1D1D;color:var(--red-dk);border-radius:var(--radius);padding:14px 18px;font-size:12px}
-    .empty{color:var(--text-3);font-size:12px;padding:32px;text-align:center;border:1px dashed var(--border);border-radius:var(--radius);background:var(--surface)}
-    .sales-error{font-size:10px;color:#F97316;background:#1C0F00;border:1px solid #7C3500;padding:5px 10px;border-radius:var(--radius-xs);margin-bottom:14px}
-
-    @media(max-width:768px){
-      .app-header,.main-content{padding:12px 14px}
-      .tab-nav{padding:0 8px}
-      .tab-btn{padding:10px 14px;font-size:11px}
-      .columns-row{flex-direction:column;overflow-x:visible}
-      .column-container,.column-departments{flex:none;min-width:0;width:100%}
-      .progress-card{flex-direction:column;gap:12px}
-      .kpi-bar,.date-filter-wrap{gap:7px}
-      .kpi-card{min-width:110px}
-    }
-  </style>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Snackible B2B Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="styles.css"/>
 </head>
 <body>
 <div id="root"></div>
-<script type="text/babel">
-const { useState, useEffect, useCallback, useMemo } = React;
 
-// ── CONFIG ──────────────────────────────────────────────────────────────────
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script>
+// ── CONFIG ───────────────────────────────────────────────────────────────────
 const PROXY = "https://script.google.com/a/macros/snackible.com/s/AKfycbxxuPIWVlrpAbHF9dz5UyJAjpJmTJDyyQxSjyPhDMAhl7guQip5-4WGxbxuvMay3reD/exec";
 const SALES_SHEET_NAME = "Sales";
 const EXEC_NAMES = ["Prabnoor","Kritik"];
@@ -201,395 +32,364 @@ const DATE_FILTERS = ["Lifetime","This Month","Last Month","This Week","Custom"]
 function parseCSV(text){
   const lines = text.trim().split("\n");
   if(lines.length < 2) return [];
-  const headers = lines[0].split(",").map(h => h.trim().replace(/^"|"$/g,""));
-  return lines.slice(1)
-    .filter(l => l.trim())
-    .map(line => {
-      const vals = [];
-      let cur = "", inQ = false;
-      for(let ch of line){
-        if(ch==='"') inQ=!inQ;
-        else if(ch===',' && !inQ){ vals.push(cur.trim()); cur=""; }
-        else cur+=ch;
-      }
-      vals.push(cur.trim());
-      return headers.reduce((obj,h,i) => ({...obj,[h]:vals[i]||""}),{});
-    });
+  const headers = lines[0].split(",").map(h=>h.trim().replace(/^"|"$/g,""));
+  return lines.slice(1).filter(l=>l.trim()).map(line=>{
+    const vals=[];let cur="",inQ=false;
+    for(let ch of line){
+      if(ch==='"') inQ=!inQ;
+      else if(ch===',' && !inQ){vals.push(cur.trim());cur="";}
+      else cur+=ch;
+    }
+    vals.push(cur.trim());
+    return headers.reduce((obj,h,i)=>({...obj,[h]:vals[i]||""}),{});
+  });
 }
 
 function parseSalesDate(str){
   if(!str) return null;
-  str = str.trim();
-  // Try DD-MM-YYYY or DD/MM/YYYY
-  let m = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
-  if(m){
-    const y = m[3].length===2 ? 2000+(+m[3]) : +m[3];
-    return new Date(y, +m[2]-1, +m[1]);
-  }
-  // Try YYYY-MM-DD
-  m = str.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  if(m) return new Date(+m[1], +m[2]-1, +m[3]);
-  // Fallback
-  const d = new Date(str);
-  return isNaN(d.getTime()) ? null : d;
+  str=str.trim();
+  let m=str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
+  if(m){const y=m[3].length===2?2000+(+m[3]):(+m[3]);return new Date(y,+m[2]-1,+m[1]);}
+  m=str.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if(m) return new Date(+m[1],+m[2]-1,+m[3]);
+  const d=new Date(str);return isNaN(d.getTime())?null:d;
 }
 
 function parseSalesAmt(str){
   if(!str) return 0;
-  const n = parseFloat(String(str).replace(/[₹,\s]/g,""));
-  return isNaN(n) ? 0 : n;
+  const n=parseFloat(String(str).replace(/[₹,\s]/g,""));
+  return isNaN(n)?0:n;
 }
 
 function formatINR(n){
-  if(!n || isNaN(n)) return "₹0";
-  if(n >= 10000000) return "₹"+(n/10000000).toFixed(2)+"Cr";
-  if(n >= 100000) return "₹"+(n/100000).toFixed(2)+"L";
-  if(n >= 1000) return "₹"+(n/1000).toFixed(1)+"K";
+  if(!n||isNaN(n)) return "₹0";
+  if(n>=10000000) return "₹"+(n/10000000).toFixed(2)+"Cr";
+  if(n>=100000) return "₹"+(n/100000).toFixed(2)+"L";
+  if(n>=1000) return "₹"+(n/1000).toFixed(1)+"K";
   return "₹"+n.toLocaleString("en-IN");
 }
 
-function getToday(){ const d=new Date(); return new Date(d.getFullYear(),d.getMonth(),d.getDate()); }
+function getToday(){const d=new Date();return new Date(d.getFullYear(),d.getMonth(),d.getDate());}
 
-function getDateRange(filter, customFrom, customTo){
+function getDateRange(filter,customFrom,customTo){
   if(filter==="Lifetime") return null;
-  const today = getToday();
-  if(filter==="This Month") return {from:new Date(today.getFullYear(),today.getMonth(),1), to:today};
-  if(filter==="Last Month"){
-    return {from:new Date(today.getFullYear(),today.getMonth()-1,1), to:new Date(today.getFullYear(),today.getMonth(),0)};
-  }
+  const today=getToday();
+  if(filter==="This Month") return {from:new Date(today.getFullYear(),today.getMonth(),1),to:today};
+  if(filter==="Last Month") return {from:new Date(today.getFullYear(),today.getMonth()-1,1),to:new Date(today.getFullYear(),today.getMonth(),0)};
   if(filter==="This Week"){
-    const dow = today.getDay();
-    const from = new Date(today);
-    from.setDate(today.getDate() - (dow===0?6:dow-1));
-    return {from, to:today};
+    const dow=today.getDay();
+    const from=new Date(today);
+    from.setDate(today.getDate()-(dow===0?6:dow-1));
+    return {from,to:today};
   }
-  if(filter==="Custom" && customFrom && customTo){
-    return {from:new Date(customFrom), to:new Date(customTo)};
-  }
+  if(filter==="Custom"&&customFrom&&customTo) return {from:new Date(customFrom),to:new Date(customTo)};
   return null;
 }
 
-function filterSalesByDate(rows, filter, customFrom, customTo){
-  const range = getDateRange(filter, customFrom, customTo);
+function filterSalesByDate(rows,filter,customFrom,customTo){
+  const range=getDateRange(filter,customFrom,customTo);
   if(!range) return rows;
-  return rows.filter(r => {
-    const d = parseSalesDate(r["Order Date"]);
+  return rows.filter(r=>{
+    const d=parseSalesDate(r["Order Date"]);
     if(!d) return false;
-    return d >= range.from && d <= range.to;
+    return d>=range.from && d<=range.to;
   });
 }
 
-function isDiwali(t){ return t["Department"]==="Diwali"||(t["Task Name"]||"").toLowerCase().includes("diwali"); }
-function getDept(t){ return isDiwali(t) ? "Diwali" : (t["Department"]||""); }
+function isDiwali(t){return t["Department"]==="Diwali"||(t["Task Name"]||"").toLowerCase().includes("diwali");}
+function getDept(t){return isDiwali(t)?"Diwali":(t["Department"]||"");}
 function loadOverrides(){try{return JSON.parse(localStorage.getItem("taskOverrides")||"{}");}catch{return {};}}
 function saveOverrides(d){localStorage.setItem("taskOverrides",JSON.stringify(d));}
+
+// ── REACT ALIASES ─────────────────────────────────────────────────────────────
+const {useState,useEffect,useCallback,useMemo} = React;
+const e = React.createElement;
 
 // ── COMPONENTS ────────────────────────────────────────────────────────────────
 function PriorityBadge({priority}){
   const cls={Urgent:"urgent",Important:"important",Normal:"normal"}[priority]||"normal";
   const icons={Urgent:"🔴",Important:"🟡",Normal:"🟢"};
-  return <span className={`priority-badge ${cls}`}>{icons[priority]||"🟢"} {priority||"Normal"}</span>;
+  return e("span",{className:`priority-badge ${cls}`},(icons[priority]||"🟢")+" "+(priority||"Normal"));
 }
 
 function StatusButton({status,onClick,readonly}){
-  const s = status||"Not Started";
+  const s=status||"Not Started";
   const cls={"Not Started":"not-started","In Progress":"in-progress","Blocked":"blocked","Done":"done"}[s]||"not-started";
   const icons={"Not Started":"○","In Progress":"⟳","Blocked":"⚠","Done":"✓"};
-  const next = STATUS_CYCLE[(STATUS_CYCLE.indexOf(s)+1)%STATUS_CYCLE.length];
-  return(
-    <button className={`status-btn ${cls} ${readonly?"readonly":""}`} onClick={readonly?undefined:onClick}>
-      <span>{icons[s]||"○"}</span>{s}
-      {!readonly && <span className="next-hint">→{next}</span>}
-    </button>
+  const next=STATUS_CYCLE[(STATUS_CYCLE.indexOf(s)+1)%STATUS_CYCLE.length];
+  return e("button",{className:`status-btn ${cls} ${readonly?"readonly":""}`,onClick:readonly?undefined:onClick},
+    e("span",null,icons[s]||"○"),
+    s,
+    !readonly && e("span",{className:"next-hint"},"→"+next)
   );
 }
 
 function TaskCard({task,onStatusChange}){
-  const status = task.Status||"Not Started";
-  const priority = task["Priority"]||"Normal";
-  const daysLeft = task["Date"] ? Math.ceil((new Date(task["Date"])-new Date())/86400000) : null;
-  const isOverdue = daysLeft!==null && daysLeft<0 && status!=="Done";
-  const isDueSoon = daysLeft!==null && daysLeft<=3 && daysLeft>=0 && status!=="Done";
-  const prCls = {Urgent:"urgent",Important:"important",Normal:"normal"}[priority]||"normal";
-  return(
-    <div className={`task-card ${prCls} ${status==="Done"?"done":""} ${isOverdue?"overdue":""}`}>
-      <div className="card-top">
-        <div className="card-badges">
-          <PriorityBadge priority={priority}/>
-          {task["Date"] && (
-            <span className={`deadline-badge ${isOverdue?"overdue":isDueSoon?"soon":""}`}>
-              {isOverdue?`⚠ ${Math.abs(daysLeft)}d`:isDueSoon?`⏰ ${daysLeft}d`:`📅 ${task["Date"]}`}
-            </span>
-          )}
-        </div>
-        <StatusButton status={status} onClick={onStatusChange}/>
-      </div>
-      <div className={`task-title ${status==="Done"?"done-title":""}`}>{task["Task Name"]||"Untitled"}</div>
-      {task["Remarks"] && (
-        <div className="remarks-box">
-          <div className="remarks-label">💬 Remarks</div>
-          <div className="remarks-text">{task["Remarks"]}</div>
-        </div>
-      )}
-      {status==="Done" && task["Completion Time"] && (
-        <div className="completion-info">✅ {task["Completion Time"]}</div>
-      )}
-    </div>
+  const status=task.Status||"Not Started";
+  const priority=task["Priority"]||"Normal";
+  const daysLeft=task["Date"]?Math.ceil((new Date(task["Date"])-new Date())/86400000):null;
+  const isOverdue=daysLeft!==null&&daysLeft<0&&status!=="Done";
+  const isDueSoon=daysLeft!==null&&daysLeft<=3&&daysLeft>=0&&status!=="Done";
+  const prCls={Urgent:"urgent",Important:"important",Normal:"normal"}[priority]||"normal";
+  return e("div",{className:`task-card ${prCls} ${status==="Done"?"done":""} ${isOverdue?"overdue":""}`},
+    e("div",{className:"card-top"},
+      e("div",{className:"card-badges"},
+        e(PriorityBadge,{priority}),
+        task["Date"] && e("span",{className:`deadline-badge ${isOverdue?"overdue":isDueSoon?"soon":""}`},
+          isOverdue?`⚠ ${Math.abs(daysLeft)}d`:isDueSoon?`⏰ ${daysLeft}d`:`📅 ${task["Date"]}`
+        )
+      ),
+      e(StatusButton,{status,onClick:onStatusChange})
+    ),
+    e("div",{className:`task-title ${status==="Done"?"done-title":""}`},task["Task Name"]||"Untitled"),
+    task["Remarks"] && e("div",{className:"remarks-box"},
+      e("div",{className:"remarks-label"},"💬 Remarks"),
+      e("div",{className:"remarks-text"},task["Remarks"])
+    ),
+    status==="Done" && task["Completion Time"] && e("div",{className:"completion-info"},"✅ "+task["Completion Time"])
   );
 }
 
-function DateFilterBar({value, onChange, customFrom, customTo, onCustomChange, colorClass}){
-  return(
-    <div className="date-filter-wrap">
-      <span className="date-filter-label">Period</span>
-      {DATE_FILTERS.map(f => (
-        <button key={f}
-          className={`date-filter-btn ${value===f ? "active-"+colorClass : ""}`}
-          onClick={() => onChange(f)}>
-          {f}
-        </button>
-      ))}
-      {value==="Custom" && (
-        <div className="custom-dates">
-          <input type="date" value={customFrom} onChange={e => onCustomChange("from",e.target.value)} className="date-input"/>
-          <span className="date-sep">→</span>
-          <input type="date" value={customTo} onChange={e => onCustomChange("to",e.target.value)} className="date-input"/>
-        </div>
-      )}
-    </div>
+function DateFilterBar({value,onChange,customFrom,customTo,onCustomChange,colorClass}){
+  return e("div",{className:"date-filter-wrap"},
+    e("span",{className:"date-filter-label"},"Period"),
+    ...DATE_FILTERS.map(f=>
+      e("button",{key:f,className:`date-filter-btn ${value===f?"active-"+colorClass:""}`,onClick:()=>onChange(f)},f)
+    ),
+    value==="Custom" && e("div",{className:"custom-dates"},
+      e("input",{type:"date",value:customFrom,onChange:ev=>onCustomChange("from",ev.target.value),className:"date-input"}),
+      e("span",{className:"date-sep"},"→"),
+      e("input",{type:"date",value:customTo,onChange:ev=>onCustomChange("to",ev.target.value),className:"date-input"})
+    )
   );
 }
 
-function KPIBar({tasks, salesTotal, salesCount, salesLoading}){
-  const isChecked = v => v === true || v === "TRUE" || v === "true";
-  const has = col => tasks.some(t => t[col] !== undefined && t[col] !== "");
-  const mailCount = has("Mail Sent")  ? tasks.filter(t=>isChecked(t["Mail Sent"])).length  : null;
-  const callCount = has("Call Done")  ? tasks.filter(t=>isChecked(t["Call Done"])).length  : null;
-  const liCount   = has("LinkedIn")   ? tasks.filter(t=>isChecked(t["LinkedIn"])).length   : null;
-  const sampCount = has("Sample Sent")? tasks.filter(t=>isChecked(t["Sample Sent"])).length: null;
-
-  const kpis = [
-    {label:"Gross Sales", value: salesLoading ? "…" : formatINR(salesTotal), sub: salesLoading ? null : `${salesCount} order${salesCount===1?"":"s"}`, cls:"kpi-sales", color:"green"},
-    {label:"Mails",       value: mailCount!==null ? mailCount : "—", cls:"kpi-mails",    color:"amber"},
-    {label:"Calls",       value: callCount!==null ? callCount : "—", cls:"kpi-calls",    color:"blue"},
-    {label:"LinkedIn",    value: liCount!==null   ? liCount   : "—", cls:"kpi-linkedin", color:"purple"},
-    {label:"Samples Sent",value: sampCount!==null ? sampCount : "—", cls:"kpi-samples",  color:"sky"},
+function KPIBar({tasks,salesTotal,salesCount,salesLoading}){
+  const isChecked=v=>v===true||v==="TRUE"||v==="true";
+  const has=col=>tasks.some(t=>t[col]!==undefined&&t[col]!=="");
+  const mailCount=has("Mail Sent")?tasks.filter(t=>isChecked(t["Mail Sent"])).length:null;
+  const callCount=has("Call Done")?tasks.filter(t=>isChecked(t["Call Done"])).length:null;
+  const liCount=has("LinkedIn")?tasks.filter(t=>isChecked(t["LinkedIn"])).length:null;
+  const sampCount=has("Sample Sent")?tasks.filter(t=>isChecked(t["Sample Sent"])).length:null;
+  const kpis=[
+    {label:"Gross Sales",value:salesLoading?"…":formatINR(salesTotal),sub:salesLoading?null:`${salesCount} order${salesCount===1?"":"s"}`,cls:"kpi-sales",color:"green"},
+    {label:"Mails",value:mailCount!==null?mailCount:"—",cls:"kpi-mails",color:"amber"},
+    {label:"Calls",value:callCount!==null?callCount:"—",cls:"kpi-calls",color:"blue"},
+    {label:"LinkedIn",value:liCount!==null?liCount:"—",cls:"kpi-linkedin",color:"purple"},
+    {label:"Samples Sent",value:sampCount!==null?sampCount:"—",cls:"kpi-samples",color:"sky"},
   ];
-  return(
-    <div className="kpi-bar">
-      {kpis.map(k => (
-        <div key={k.label} className={`kpi-card ${k.cls}`}>
-          <div className="kpi-label">{k.label}</div>
-          <div className={`kpi-value ${k.color}`}>{k.value}</div>
-          {k.sub && <div className="kpi-sub">{k.sub}</div>}
-        </div>
-      ))}
-    </div>
+  return e("div",{className:"kpi-bar"},
+    ...kpis.map(k=>
+      e("div",{key:k.label,className:`kpi-card ${k.cls}`},
+        e("div",{className:"kpi-label"},k.label),
+        e("div",{className:`kpi-value ${k.color}`},k.value),
+        k.sub && e("div",{className:"kpi-sub"},k.sub)
+      )
+    )
   );
 }
 
-function ProgressCard({tasks, colorClass, name}){
-  const done = tasks.filter(t=>t.Status==="Done").length;
-  const inP  = tasks.filter(t=>t.Status==="In Progress").length;
-  const pct  = tasks.length ? Math.round(done/tasks.length*100) : 0;
-  const iPct = tasks.length ? Math.round(inP/tasks.length*100)  : 0;
-  return(
-    <div className="progress-card">
-      <div className={`progress-pct ${colorClass}`}>{pct}%</div>
-      <div className="progress-right">
-        <div className="progress-label">{name} — Task Completion</div>
-        <div className="progress-bar-bg">
-          <div className={`progress-bar-fill done-fill ${colorClass}`} style={{width:`${pct}%`}}/>
-          <div className="progress-bar-fill ip-fill" style={{"--done-pct":`${pct}%`,width:`${iPct}%`}}/>
-        </div>
-        <div className="progress-chips">
-          <span className="chip chip-done">✓ {done} done</span>
-          <span className="chip chip-ip">⟳ {inP} in progress</span>
-          <span className="chip chip-ns">○ {tasks.length-done-inP} pending</span>
-        </div>
-      </div>
-    </div>
+function ProgressCard({tasks,colorClass,name}){
+  const done=tasks.filter(t=>t.Status==="Done").length;
+  const inP=tasks.filter(t=>t.Status==="In Progress").length;
+  const pct=tasks.length?Math.round(done/tasks.length*100):0;
+  const iPct=tasks.length?Math.round(inP/tasks.length*100):0;
+  return e("div",{className:"progress-card"},
+    e("div",{className:`progress-pct ${colorClass}`},pct+"%"),
+    e("div",{className:"progress-right"},
+      e("div",{className:"progress-label"},name+" — Task Completion"),
+      e("div",{className:"progress-bar-bg"},
+        e("div",{className:`progress-bar-fill done-fill ${colorClass}`,style:{width:`${pct}%`}}),
+        e("div",{className:"progress-bar-fill ip-fill",style:{"--done-pct":`${pct}%`,width:`${iPct}%`}})
+      ),
+      e("div",{className:"progress-chips"},
+        e("span",{className:"chip chip-done"},"✓ "+done+" done"),
+        e("span",{className:"chip chip-ip"},"⟳ "+inP+" in progress"),
+        e("span",{className:"chip chip-ns"},"○ "+(tasks.length-done-inP)+" pending")
+      )
+    )
   );
 }
 
-function DepartmentsColumn({tasks, onStatusChange}){
+// ── ACCORDION COLUMN ──────────────────────────────────────────────────────────
+function AccordionColumn({id,openId,onToggle,headerCls,icon,label,count,extraBadge,colCls,children}){
+  const isOpen=openId===id;
+  return e("div",{className:`accordion-col ${isOpen?"open":"collapsed"} ${colCls||""}`},
+    e("div",{className:`accordion-header ${headerCls}`,onClick:()=>onToggle(id)},
+      e("div",{className:"accordion-header-left"},
+        e("span",{className:"accordion-header-icon"},icon),
+        e("span",{className:"accordion-header-label"},label)
+      ),
+      e("div",{className:"accordion-header-right"},
+        extraBadge && e("span",{className:"priority-badge-header"},extraBadge),
+        e("span",{className:"col-count"},count),
+        e("span",{className:"chevron"},"▼")
+      )
+    ),
+    e("div",{className:"accordion-body"},children)
+  );
+}
+
+// ── COLUMN CONTENT COMPONENTS ─────────────────────────────────────────────────
+function DepartmentsContent({tasks,onStatusChange}){
   const depts=[{key:"RND",label:"RND 🔬"},{key:"Marketing",label:"Marketing 📣"},{key:"Operations",label:"Operations ⚙️"}];
-  const sorted = arr => [...arr].sort((a,b)=>(pOrder[a["Priority"]]??2)-(pOrder[b["Priority"]]??2));
-  const allEmpty = depts.every(d => tasks.filter(t=>t["Department"]===d.key).length===0);
-  return(
-    <div className="column-container column-departments">
-      <div className="column-header col-header-depts">
-        <div className="column-header-left"><span className="column-header-icon">🏢</span><span className="column-header-label">Departments</span></div>
-        <span className="col-count">{tasks.length}</span>
-      </div>
-      {allEmpty ? <div className="column-empty">No department tasks yet</div>
-        : depts.map(dept => {
-            const dt = sorted(tasks.filter(t=>t["Department"]===dept.key));
-            if(!dt.length) return null;
-            return(
-              <div key={dept.key} className="dept-section">
-                <div className="dept-section-label">{dept.label}</div>
-                <div className="column-tasks">
-                  {dt.map(task=><TaskCard key={task._id} task={task} onStatusChange={()=>onStatusChange(task._id,task.Status)}/>)}
-                </div>
-              </div>
-            );
-          })
-      }
-    </div>
+  const sorted=arr=>[...arr].sort((a,b)=>(pOrder[a["Priority"]]??2)-(pOrder[b["Priority"]]??2));
+  const allEmpty=depts.every(d=>tasks.filter(t=>t["Department"]===d.key).length===0);
+  if(allEmpty) return e("div",{className:"column-empty"},"No department tasks yet");
+  return e("div",null,
+    ...depts.map(dept=>{
+      const dt=sorted(tasks.filter(t=>t["Department"]===dept.key));
+      if(!dt.length) return null;
+      return e("div",{key:dept.key,className:"dept-section"},
+        e("div",{className:"dept-section-label"},dept.label),
+        e("div",{className:"column-tasks"},
+          ...dt.map(task=>e(TaskCard,{key:task._id,task,onStatusChange:()=>onStatusChange(task._id,task.Status)}))
+        )
+      );
+    })
   );
 }
 
-function DiwaliColumn({tasks, onStatusChange}){
-  const sorted = [...tasks].sort((a,b)=>(pOrder[a["Priority"]]??2)-(pOrder[b["Priority"]]??2));
-  return(
-    <div className="column-container column-diwali">
-      <div className="column-header col-header-diwali">
-        <div className="column-header-left"><span className="column-header-icon">🪔</span><span className="column-header-label">Diwali Outreach</span></div>
-        <div className="column-header-right">
-          <span className="priority-badge-header">🔥 Priority</span>
-          <span className="col-count">{tasks.length}</span>
-        </div>
-      </div>
-      {sorted.length===0 ? <div className="column-empty">No Diwali tasks</div>
-        : <div className="column-tasks">{sorted.map(task=><TaskCard key={task._id} task={task} onStatusChange={()=>onStatusChange(task._id,task.Status)}/>)}</div>
-      }
-    </div>
+function DiwaliContent({tasks,onStatusChange}){
+  const sorted=[...tasks].sort((a,b)=>(pOrder[a["Priority"]]??2)-(pOrder[b["Priority"]]??2));
+  if(!sorted.length) return e("div",{className:"column-empty"},"No Diwali tasks");
+  return e("div",{className:"column-tasks"},
+    ...sorted.map(task=>e(TaskCard,{key:task._id,task,onStatusChange:()=>onStatusChange(task._id,task.Status)}))
   );
 }
 
-function PipelineColumn({tasks, onStatusChange}){
-  return(
-    <div className="column-container">
-      <div className="column-header col-header-pipeline">
-        <div className="column-header-left"><span className="column-header-icon">📦</span><span className="column-header-label">Pipeline</span></div>
-        <span className="col-count">{tasks.length}</span>
-      </div>
-      {tasks.length===0 ? <div className="column-empty">No pipeline tasks</div>
-        : PIPELINE_STAGES.map(stage=>{
-            const st = tasks.filter(t=>(t["Pipeline Stage"]||"Follow-up")===stage.key);
-            if(!st.length) return null;
-            return(
-              <div key={stage.key}>
-                <div className="pipeline-stage-label">{stage.label}</div>
-                <div className="column-tasks">{st.map(task=><TaskCard key={task._id} task={task} onStatusChange={()=>onStatusChange(task._id,task.Status)}/>)}</div>
-              </div>
-            );
-          })
-      }
-    </div>
+function PipelineContent({tasks,onStatusChange}){
+  if(!tasks.length) return e("div",{className:"column-empty"},"No pipeline tasks");
+  return e("div",null,
+    ...PIPELINE_STAGES.map(stage=>{
+      const st=tasks.filter(t=>(t["Pipeline Stage"]||"Follow-up")===stage.key);
+      if(!st.length) return null;
+      return e("div",{key:stage.key},
+        e("div",{className:"pipeline-stage-label"},stage.label),
+        e("div",{className:"column-tasks"},
+          ...st.map(task=>e(TaskCard,{key:task._id,task,onStatusChange:()=>onStatusChange(task._id,task.Status)}))
+        )
+      );
+    })
   );
 }
 
-function ClientsColumn({tasks, onStatusChange}){
-  const sorted = [...tasks].sort((a,b)=>(pOrder[a["Priority"]]??2)-(pOrder[b["Priority"]]??2));
-  return(
-    <div className="column-container">
-      <div className="column-header col-header-clients">
-        <div className="column-header-left"><span className="column-header-icon">👥</span><span className="column-header-label">Clients</span></div>
-        <span className="col-count">{tasks.length}</span>
-      </div>
-      {sorted.length===0 ? <div className="column-empty">No client tasks</div>
-        : <div className="column-tasks">{sorted.map(task=><TaskCard key={task._id} task={task} onStatusChange={()=>onStatusChange(task._id,task.Status)}/>)}</div>
-      }
-    </div>
+function ClientsContent({tasks,onStatusChange}){
+  const sorted=[...tasks].sort((a,b)=>(pOrder[a["Priority"]]??2)-(pOrder[b["Priority"]]??2));
+  if(!sorted.length) return e("div",{className:"column-empty"},"No client tasks");
+  return e("div",{className:"column-tasks"},
+    ...sorted.map(task=>e(TaskCard,{key:task._id,task,onStatusChange:()=>onStatusChange(task._id,task.Status)}))
   );
 }
 
-function ColumnsView({tasks, onStatusChange}){
-  const byDept = d => tasks.filter(t=>getDept(t)===d);
-  const deptTasks = tasks.filter(t=>["RND","Marketing","Operations"].includes(getDept(t)));
-  return(
-    <div className="columns-row">
-      <DepartmentsColumn tasks={deptTasks} onStatusChange={onStatusChange}/>
-      <DiwaliColumn tasks={byDept("Diwali")} onStatusChange={onStatusChange}/>
-      <PipelineColumn tasks={byDept("Pipeline")} onStatusChange={onStatusChange}/>
-      <ClientsColumn tasks={byDept("Clients")} onStatusChange={onStatusChange}/>
-    </div>
+// ── COLUMNS VIEW ──────────────────────────────────────────────────────────────
+function ColumnsView({tasks,onStatusChange}){
+  const [openId,setOpenId]=useState(null);
+  const toggle=id=>setOpenId(prev=>prev===id?null:id);
+  const byDept=d=>tasks.filter(t=>getDept(t)===d);
+  const deptTasks=tasks.filter(t=>["RND","Marketing","Operations"].includes(getDept(t)));
+
+  return e("div",{className:"columns-row"},
+    e(AccordionColumn,{
+      id:"departments",openId,onToggle:toggle,
+      headerCls:"col-hdr-depts",icon:"🏢",label:"Departments",count:deptTasks.length,
+      colCls:"col-departments"
+    }, e(DepartmentsContent,{tasks:deptTasks,onStatusChange})),
+
+    e(AccordionColumn,{
+      id:"diwali",openId,onToggle:toggle,
+      headerCls:"col-hdr-diwali",icon:"🪔",label:"Diwali Outreach",count:byDept("Diwali").length,
+      extraBadge:"🔥 Priority",colCls:"col-diwali"
+    }, e(DiwaliContent,{tasks:byDept("Diwali"),onStatusChange})),
+
+    e(AccordionColumn,{
+      id:"pipeline",openId,onToggle:toggle,
+      headerCls:"col-hdr-pipeline",icon:"📦",label:"Pipeline",count:byDept("Pipeline").length
+    }, e(PipelineContent,{tasks:byDept("Pipeline"),onStatusChange})),
+
+    e(AccordionColumn,{
+      id:"clients",openId,onToggle:toggle,
+      headerCls:"col-hdr-clients",icon:"👥",label:"Clients",count:byDept("Clients").length
+    }, e(ClientsContent,{tasks:byDept("Clients"),onStatusChange}))
   );
 }
 
-function ExecTab({tasks, execName, overrides, onStatusChange, colorClass, salesData, salesLoading, salesError, dateFilter, setDateFilter, customFrom, customTo, onCustomChange}){
-  const myTasks = tasks
-    .filter(t=>t.Assignee===execName && t["Task Name"])
-    .map(t=>({...t, Status:overrides[t._id]||t["Status"]||"Not Started"}));
+// ── EXEC TAB ──────────────────────────────────────────────────────────────────
+function ExecTab({tasks,execName,overrides,onStatusChange,colorClass,salesData,salesLoading,salesError,dateFilter,setDateFilter,customFrom,customTo,onCustomChange}){
+  const myTasks=tasks
+    .filter(t=>t.Assignee===execName&&t["Task Name"])
+    .map(t=>({...t,Status:overrides[t._id]||t["Status"]||"Not Started"}));
 
-  const mySalesRows = useMemo(()=>salesData.filter(r=>{
-    const poc = (r["POC"]||"").trim().toLowerCase()
-      .replace("prabhnoor","prabnoor");
-    return poc === execName.toLowerCase();
-  }), [salesData, execName]);
+  const mySalesRows=useMemo(()=>salesData.filter(r=>{
+    const poc=(r["POC"]||"").trim().toLowerCase().replace("prabhnoor","prabnoor");
+    return poc===execName.toLowerCase();
+  }),[salesData,execName]);
 
-  const filteredSales = useMemo(()=>filterSalesByDate(mySalesRows, dateFilter, customFrom, customTo), [mySalesRows, dateFilter, customFrom, customTo]);
-  const salesTotal = useMemo(()=>filteredSales.reduce((s,r)=>s+parseSalesAmt(r["Gross Sales "]||r["Gross Sales"]),0), [filteredSales]);
-  const salesCount = filteredSales.length;
+  const filteredSales=useMemo(()=>filterSalesByDate(mySalesRows,dateFilter,customFrom,customTo),[mySalesRows,dateFilter,customFrom,customTo]);
+  const salesTotal=useMemo(()=>filteredSales.reduce((s,r)=>s+parseSalesAmt(r["Gross Sales "]||r["Gross Sales"]),0),[filteredSales]);
+  const salesCount=filteredSales.length;
 
-  return(
-    <div>
-      <DateFilterBar value={dateFilter} onChange={setDateFilter} customFrom={customFrom} customTo={customTo} onCustomChange={onCustomChange} colorClass={colorClass}/>
-      {salesError && <div className="sales-error">⚠ Sales data unavailable: {salesError} — update the Apps Script proxy to support sheetId param.</div>}
-      <KPIBar tasks={myTasks} salesTotal={salesTotal} salesCount={salesCount} salesLoading={salesLoading}/>
-      <ProgressCard tasks={myTasks} colorClass={colorClass} name={execName}/>
-      {myTasks.length===0
-        ? <div className="empty">No tasks yet — add them to the Google Sheet.</div>
-        : <ColumnsView tasks={myTasks} onStatusChange={onStatusChange}/>
-      }
-    </div>
+  return e("div",null,
+    e(DateFilterBar,{value:dateFilter,onChange:setDateFilter,customFrom,customTo,onCustomChange,colorClass}),
+    salesError && e("div",{className:"sales-error"},"⚠ Sales data unavailable: "+salesError),
+    e(KPIBar,{tasks:myTasks,salesTotal,salesCount,salesLoading}),
+    e(ProgressCard,{tasks:myTasks,colorClass,name:execName}),
+    myTasks.length===0
+      ? e("div",{className:"empty"},"No tasks yet — add them to the Google Sheet.")
+      : e(ColumnsView,{tasks:myTasks,onStatusChange})
   );
 }
-
 
 // ── APP ───────────────────────────────────────────────────────────────────────
 function App(){
-  const [tasks, setTasks]           = useState([]);
-  const [overrides, setOverrides]   = useState(loadOverrides);
-  const [activeTab, setActiveTab]   = useState(0);
-  const [loading, setLoading]       = useState(true);
-  const [error, setError]           = useState(null);
-  const [lastSync, setLastSync]     = useState(null);
-  const [salesData, setSalesData]   = useState([]);
-  const [salesLoading, setSalesLoading] = useState(true);
-  const [salesError, setSalesError] = useState(null);
-  const [dateFilter, setDateFilter] = useState("Lifetime");
-  const [customFrom, setCustomFrom] = useState("");
-  const [customTo, setCustomTo]     = useState("");
+  const [tasks,setTasks]=useState([]);
+  const [overrides,setOverrides]=useState(loadOverrides);
+  const [activeTab,setActiveTab]=useState(0);
+  const [loading,setLoading]=useState(true);
+  const [error,setError]=useState(null);
+  const [lastSync,setLastSync]=useState(null);
+  const [salesData,setSalesData]=useState([]);
+  const [salesLoading,setSalesLoading]=useState(true);
+  const [salesError,setSalesError]=useState(null);
+  const [dateFilter,setDateFilter]=useState("Lifetime");
+  const [customFrom,setCustomFrom]=useState("");
+  const [customTo,setCustomTo]=useState("");
 
-  const handleCustomChange = (field, val) => {
+  const handleCustomChange=(field,val)=>{
     if(field==="from") setCustomFrom(val);
     else setCustomTo(val);
   };
 
-  const fetchTasks = useCallback(async () => {
+  const fetchTasks=useCallback(async()=>{
     try{
-      const results = await Promise.all(EXEC_NAMES.map(async name=>{
-        const res = await fetch(`${PROXY}?name=${name}`);
+      const results=await Promise.all(EXEC_NAMES.map(async name=>{
+        const res=await fetch(`${PROXY}?name=${name}`);
         if(!res.ok) throw new Error(`${res.status}`);
-        const text = await res.text();
+        const text=await res.text();
         if(text.startsWith("error:")) throw new Error(text);
-        return parseCSV(text).map((r,i)=>({...r, _id:`${name}-${i}`, Assignee:name}));
+        return parseCSV(text).map((r,i)=>({...r,_id:`${name}-${i}`,Assignee:name}));
       }));
       setTasks(results.flat());
       setLastSync(new Date());
       setError(null);
-    }catch(e){
+    }catch(err){
       setError("Could not load tasks. Check the Apps Script proxy.");
     }finally{
       setLoading(false);
     }
   },[]);
 
-  const fetchSales = useCallback(async () => {
+  const fetchSales=useCallback(async()=>{
     setSalesLoading(true);
     try{
-      const res = await fetch(`${PROXY}?name=${SALES_SHEET_NAME}`);
+      const res=await fetch(`${PROXY}?name=${SALES_SHEET_NAME}`);
       if(!res.ok) throw new Error(`HTTP ${res.status}`);
-      const text = await res.text();
+      const text=await res.text();
       if(text.startsWith("error:")) throw new Error(text.replace("error:","").trim());
-      const rows = parseCSV(text);
-      setSalesData(rows);
+      setSalesData(parseCSV(text));
       setSalesError(null);
-    }catch(e){
-      setSalesError(e.message);
+    }catch(err){
+      setSalesError(err.message);
     }finally{
       setSalesLoading(false);
     }
@@ -598,59 +398,58 @@ function App(){
   useEffect(()=>{
     fetchTasks();
     fetchSales();
-    const t1 = setInterval(fetchTasks, 60000);
-    const t2 = setInterval(fetchSales, 120000);
-    return ()=>{ clearInterval(t1); clearInterval(t2); };
-  },[fetchTasks, fetchSales]);
+    const t1=setInterval(fetchTasks,60000);
+    const t2=setInterval(fetchSales,120000);
+    return()=>{clearInterval(t1);clearInterval(t2);};
+  },[fetchTasks,fetchSales]);
 
-
-  const handleStatus = (id, current) => {
-    const next = STATUS_CYCLE[(STATUS_CYCLE.indexOf(current||"Not Started")+1)%STATUS_CYCLE.length];
-    const u = {...overrides,[id]:next};
+  const handleStatus=(id,current)=>{
+    const next=STATUS_CYCLE[(STATUS_CYCLE.indexOf(current||"Not Started")+1)%STATUS_CYCLE.length];
+    const u={...overrides,[id]:next};
     setOverrides(u);
     saveOverrides(u);
   };
 
-  const tabs = [
-    {label:"Prabnoor", active:"active-prabnoor", colorClass:"green"},
-    {label:"Kritik",   active:"active-kritik",   colorClass:"amber"},
+  const tabs=[
+    {label:"Prabnoor",active:"active-prabnoor",colorClass:"green"},
+    {label:"Kritik",active:"active-kritik",colorClass:"amber"},
   ];
 
-  return(
-    <div>
-      <header className="app-header">
-        <div>
-          <div className="logo-mark">SNACKIBLE<span className="logo-slash">/</span><span className="logo-b2b">B2B</span></div>
-          <div className="app-subtitle">Delegation · Tasks · Pipeline</div>
-        </div>
-        <div className="header-right">
-          {lastSync && <span className="sync-time"><span className="live-dot"/>Synced {lastSync.toLocaleTimeString()}</span>}
-          <button className="refresh-btn" onClick={()=>{fetchTasks();fetchSales();}}>↻ Refresh</button>
-        </div>
-      </header>
-
-      <nav className="tab-nav">
-        {tabs.map((tab,i)=>(
-          <button key={tab.label} className={`tab-btn ${activeTab===i?tab.active:""}`} onClick={()=>setActiveTab(i)}>
-            {tab.label}
-          </button>
-        ))}
-      </nav>
-
-      <main className="main-content">
-        {loading ? <div className="loading"><div className="spinner"/>Loading tasks…</div>
-          : error ? <div className="error-msg">⚠ {error}</div>
-          : <>
-              {activeTab===0 && <ExecTab tasks={tasks} execName="Prabnoor" overrides={overrides} onStatusChange={handleStatus} colorClass="green" salesData={salesData} salesLoading={salesLoading} salesError={salesError} dateFilter={dateFilter} setDateFilter={setDateFilter} customFrom={customFrom} customTo={customTo} onCustomChange={handleCustomChange}/>}
-              {activeTab===1 && <ExecTab tasks={tasks} execName="Kritik"   overrides={overrides} onStatusChange={handleStatus} colorClass="amber" salesData={salesData} salesLoading={salesLoading} salesError={salesError} dateFilter={dateFilter} setDateFilter={setDateFilter} customFrom={customFrom} customTo={customTo} onCustomChange={handleCustomChange}/>}
-            </>
-        }
-      </main>
-    </div>
+  return e("div",null,
+    e("header",{className:"app-header"},
+      e("div",null,
+        e("div",{className:"logo-mark"},"SNACKIBLE",e("span",{className:"logo-slash"},"/"),e("span",{className:"logo-b2b"},"B2B")),
+        e("div",{className:"app-subtitle"},"Delegation · Tasks · Pipeline")
+      ),
+      e("div",{className:"header-right"},
+        lastSync && e("span",{className:"sync-time"},e("span",{className:"live-dot"}),"Synced "+lastSync.toLocaleTimeString()),
+        e("button",{className:"refresh-btn",onClick:()=>{fetchTasks();fetchSales();}},"↻ Refresh")
+      )
+    ),
+    e("nav",{className:"tab-nav"},
+      ...tabs.map((tab,i)=>
+        e("button",{key:tab.label,className:`tab-btn ${activeTab===i?tab.active:""}`,onClick:()=>setActiveTab(i)},tab.label)
+      )
+    ),
+    e("main",{className:"main-content"},
+      loading ? e("div",{className:"loading"},e("div",{className:"spinner"}),"Loading tasks…")
+      : error ? e("div",{className:"error-msg"},"⚠ "+error)
+      : e(ExecTab,{
+          tasks,
+          execName:EXEC_NAMES[activeTab],
+          overrides,
+          onStatusChange:handleStatus,
+          colorClass:tabs[activeTab].colorClass,
+          salesData,salesLoading,salesError,
+          dateFilter,setDateFilter,
+          customFrom,customTo,
+          onCustomChange:handleCustomChange
+        })
+    )
   );
 }
 
-ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+ReactDOM.createRoot(document.getElementById("root")).render(e(App,null));
 </script>
 </body>
 </html>
